@@ -39,9 +39,13 @@ predictions = model.predict(x_test)
 # round predictions
 rounded = [round(x[0]) for x in predictions]
 
-# save predictions to csv file
-arr = np.array(rounded)
-np.savetxt("neural_network.csv",
-            np.dstack((np.arange(1, arr.size+1),arr))[0],
-            "%d,%d",
-            header="PassengerID,Survived")
+# create output file
+solution = np.vstack((test_df.index.astype('int'),
+                      np.array(rounded).astype('int')))
+
+solution = np.vstack((['PassengerID', 'Survived'],
+                       solution.transpose()))
+
+solution = pd.DataFrame(solution)
+
+solution.to_csv("Neural_Network_Solution.csv", index=False, header=False)
