@@ -5,7 +5,7 @@ Values column should contain any information about the column which needs to be 
 | ----- | ---- | ----------- | ------ | ------------ |
 | PassengerID | int | Unique Identifier | - | No |
 | Survived | int | Did the passenger survive? | 1/ 0 | **Target** |
-| Pclass | int | Class of passenger | ? | **Yes** |
+| Pclass | int | Class of passenger | 1, 2 or 3 only | **Yes** |
 | Name | str | Name of passenger | - | No |
 | Sex | str | Gender of passenger | Male/ Female | **Yes** |
 | Age | float | Age of passenger | ? | **Yes** |
