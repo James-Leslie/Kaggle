@@ -8,27 +8,31 @@ from keras.layers import Dense, Activation
 # load data as Pandas dataframe
 train_df = pd.read_csv('train.csv', index_col=0)
 test_df = pd.read_csv('test.csv', index_col=0)
+data_df = train_df.append(test_df)
 
 # categorical and continuous variables
 categorical = ['Pclass', 'Sex']
-continuous = ['Age', 'SibSp', 'Parch', 'Fare']
+continuous = ['Age', 'Fare']
 
 # separate inputs from labels
 y_train = train_df.iloc[:, :1]
-x_train = prepare_data(train_df.iloc[:, 1:], categorical, continuous)
-x_test = prepare_data(test_df.iloc[:, :], categorical, continuous)
+
+# process data
+data_processed = prepare_data(data_df, categorical, continuous)
+x_train = data_processed[:891, :]
+x_test = data_processed[891:, :]
 
 # create model
 model = Sequential()
-model.add(Dense(12, input_dim=9, activation='relu'))  # 1st hidden layer
-model.add(Dense(7, activation='relu'))  # 2nd hidden layer
+model.add(Dense(5, input_dim=x_train.shape[1], activation='relu'))  # 1st hidden layer
+# model.add(Dense(5, activation='relu'))  # 2nd hidden layer
 model.add(Dense(1, activation='sigmoid'))  # output layer
 
 # compile model
 model.compile(loss='binary_crossentropy', optimizer='adam', metrics=['accuracy'])
 
 # train model
-model.fit(x_train, y_train, epochs=100, batch_size=10)
+model.fit(x_train, y_train, epochs=100, batch_size=32)
 
 # evaluate the model
 scores = model.evaluate(x_train, y_train)
@@ -47,5 +51,4 @@ solution = np.vstack((['PassengerID', 'Survived'],
                        solution.transpose()))
 
 solution = pd.DataFrame(solution)
-
 solution.to_csv("Neural_Network_Solution.csv", index=False, header=False)

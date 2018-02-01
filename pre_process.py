@@ -23,12 +23,30 @@ def prepare_data(x, categorical_list, continuous_list):
         array containing categorical variable names
     '''
 
-    # replace nan values in Age and Fare
-    age_median = x['Age'].median()
-    x['Age'].fillna(age_median, inplace=True)
+    # extract titles from names
+    x['Title'] = x['Name']
+    for name in x['Name']:
+        x['Title'] = x['Name'].str.extract('([A-Za-z]+)\.', expand=True)
 
+    # replace rare titles with more common ones
+    mapping = {'Mlle': 'Miss', 'Major': 'Mr', 'Col': 'Mr', 'Sir': 'Mr',
+               'Don': 'Mr', 'Mme': 'Miss', 'Jonkheer': 'Mr', 'Lady': 'Mrs',
+               'Capt': 'Mr', 'Countess': 'Mrs', 'Ms': 'Miss', 'Dona': 'Mrs'}
+    x.replace({'Title': mapping}, inplace=True)
+
+    # impute missing Age values using median of Title groups
+    titles = ['Dr', 'Master', 'Miss', 'Mr', 'Mrs', 'Rev']
+    for title in titles:
+        age_to_impute = x.groupby('Title')['Age'].median()[titles.index(title)]
+        x.loc[(x['Age'].isnull()) & (x['Title'] == title), 'Age'] = age_to_impute
+
+    # impute missing Fare values using median
     age_median = x['Fare'].median()
     x['Fare'].fillna(age_median, inplace=True)
+
+    # create Family_Size column
+    x['Family_Size'] = x['Parch'] + x['SibSp']
+    continuous_list.append('Family_Size')
 
     # one hot encode categorical variables
     categorical = x[categorical_list].values
